@@ -95,7 +95,7 @@ class McpHandler
                 $this->sendMessage($result);
                 break;
             case 'tools/call':
-                ['class' => $class, 'method' => $method] = McpCollector::getMethodByName($data['params']['name']);
+                ['class' => $class, 'method' => $method] = McpCollector::getMethodByName($data['params']['name'], $serverName);
                 $class = $this->container->get($class);
                 $result = $class->{$method}(...$data['params']['arguments']);
 

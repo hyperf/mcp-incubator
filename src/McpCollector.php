@@ -25,18 +25,18 @@ class McpCollector extends MetadataCollector
      */
     public static function collectMethod(string $class, string $method, string $annotation, $value): void
     {
-        if (static::$container['_name'][$value->name] ?? null) {
+        if (static::$container[$value->serverName]['_name'][$value->name] ?? null) {
             throw new InvalidArgumentException("{$annotation} name {$value->name} is exist!");
         }
-        static::$container[$annotation][$class][$method] = $value;
-        static::$container['_name'][$value->name] = ['class' => $class, 'method' => $method];
+        static::$container[$value->serverName][$annotation][$class][$method] = $value;
+        static::$container[$value->serverName]['_name'][$value->name] = ['class' => $class, 'method' => $method];
     }
 
-    public static function getMethodsByAnnotation(string $annotation): array
+    public static function getMethodsByAnnotation(string $annotation, string $serverName = 'mcp-sse'): array
     {
         $result = [];
 
-        foreach (static::$container[$annotation] ?? [] as $class => $metadata) {
+        foreach (static::$container[$serverName][$annotation] ?? [] as $class => $metadata) {
             foreach ($metadata as $method => $value) {
                 $result[] = ['class' => $class, 'method' => $method, 'annotation' => $value];
             }
@@ -44,12 +44,8 @@ class McpCollector extends MetadataCollector
         return $result;
     }
 
-    public static function getMethodByName(string $name): ?array
+    public static function getMethodByName(string $name, string $serverName = 'mcp-sse'): ?array
     {
-        return static::$container['_name'][$name] ?? null;
-    }
-
-    public static function clear(?string $key = null): void
-    {
+        return static::$container[$serverName]['_name'][$name] ?? null;
     }
 }

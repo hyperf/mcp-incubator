@@ -29,7 +29,7 @@ class CollectionManager
         if (isset(self::$collections[$serverName]['tools'])) {
             return self::$collections[$serverName]['tools'];
         }
-        $classes = McpCollector::getMethodsByAnnotation(Tool::class);
+        $classes = McpCollector::getMethodsByAnnotation(Tool::class, $serverName);
 
         self::$collections[$serverName]['tools'] = new Collection();
         foreach ($classes as $class) {
