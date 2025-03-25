@@ -19,7 +19,7 @@ use Hyperf\Mcp\McpCollector;
 #[Attribute(Attribute::TARGET_METHOD)]
 abstract class AbstractMcpAnnotation extends AbstractAnnotation
 {
-    public function __construct(public string $name, public string $description = '', public string $serverName = 'mcp-http')
+    public function __construct(public string $name, public string $description = '', public string $serverName = 'mcp-sse')
     {
     }
 
