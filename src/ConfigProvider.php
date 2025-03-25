@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Hyperf\Mcp;
 
 use Hyperf\Contract\IdGeneratorInterface;
+use Hyperf\Mcp\Listener\RegisterProtocolListener;
 use Hyperf\Rpc\IdGenerator\UniqidIdGenerator;
 
 class ConfigProvider
@@ -23,6 +24,9 @@ class ConfigProvider
             'dependencies' => [
                 IdGeneratorInterface::class => UniqidIdGenerator::class
             ],
+            'listeners' => [
+                RegisterProtocolListener::class
+            ]
         ];
     }
 }

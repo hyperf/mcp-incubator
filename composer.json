@@ -13,7 +13,9 @@
         "hyperf/coordinator": "^3.1",
         "hyperf/di": "^3.1",
         "hyperf/http-server": "^3.1",
-        "hyperf/rpc": "^3.1"
+        "hyperf/json-rpc": "^3.1",
+        "hyperf/rpc": "^3.1",
+        "hyperf/framework": "^3.1"
     },
     "autoload": {
         "psr-4": {
