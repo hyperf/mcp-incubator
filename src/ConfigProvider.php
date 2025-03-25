@@ -26,7 +26,14 @@ class ConfigProvider
             ],
             'listeners' => [
                 RegisterProtocolListener::class
-            ]
+            ],
+            'annotations' => [
+                'scan' => [
+                    'collectors' => [
+                        McpCollector::class,
+                    ],
+                ],
+            ],
         ];
     }
 }
