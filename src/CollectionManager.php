@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace Hyperf\Mcp;
 
 use Hyperf\Collection\Collection;
-use Hyperf\Mcp\Annotation\AbstractMcpAnnotation;
+use Hyperf\Mcp\Annotation\McpAnnotation;
 use Hyperf\Mcp\Annotation\Prompt;
 use Hyperf\Mcp\Annotation\Resource;
 use Hyperf\Mcp\Annotation\Tool;
@@ -26,7 +26,7 @@ class CollectionManager
     protected static array $collections = [];
 
     /**
-     * @param class-string<AbstractMcpAnnotation> $annotation
+     * @param class-string<McpAnnotation> $annotation
      */
     public static function getCollection(string $serverName, string $annotation): Collection
     {

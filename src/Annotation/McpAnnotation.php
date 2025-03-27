@@ -15,17 +15,13 @@ namespace Hyperf\Mcp\Annotation;
 use Hyperf\Di\Annotation\AbstractAnnotation;
 use ReflectionParameter;
 
-abstract class AbstractMcpAnnotation extends AbstractAnnotation
+abstract class McpAnnotation extends AbstractAnnotation
 {
-    public string $name;
+    public string $className = '';
 
-    public string $description = '';
+    public string $target = '';
 
     public string $server = 'default';
-
-    public string $className;
-
-    public string $target;
 
     abstract public function toSchema(): array;
 

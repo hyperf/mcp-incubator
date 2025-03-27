@@ -13,14 +13,14 @@ declare(strict_types=1);
 namespace Hyperf\Mcp;
 
 use Hyperf\Di\MetadataCollector;
-use Hyperf\Mcp\Annotation\AbstractMcpAnnotation;
+use Hyperf\Mcp\Annotation\McpAnnotation;
 use InvalidArgumentException;
 
 class McpCollector extends MetadataCollector
 {
     protected static array $container = [];
 
-    public static function collectMethod(string $class, string $method, string $index, AbstractMcpAnnotation $value): void
+    public static function collectMethod(string $class, string $method, string $index, McpAnnotation $value): void
     {
         $annotation = $value::class;
         if (static::$container[$value->server]['_index'][$index] ?? null) {
@@ -31,7 +31,7 @@ class McpCollector extends MetadataCollector
     }
 
     /**
-     * @param class-string<AbstractMcpAnnotation> $annotation
+     * @param class-string<McpAnnotation> $annotation
      */
     public static function getMethodsByAnnotation(string $annotation, string $server = 'default'): array
     {
