@@ -22,6 +22,7 @@ use Hyperf\HttpMessage\Server\Response as HttpResponse;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\HttpServer\Router\Dispatched;
+use Hyperf\Mcp\Annotation\Resource;
 use Hyperf\Rpc\Protocol;
 use Hyperf\Rpc\ProtocolManager;
 use Hyperf\Rpc\Response;
@@ -84,7 +85,8 @@ class McpHandler
                 $result = [
                     'protocolVersion' => $data['params']['protocolVersion'],
                     'capabilities' => new Capabilities(
-                        CollectionManager::getToolsCollection($serverName),
+                        CollectionManager::getToolsCollection($serverName)->isNotEmpty(),
+                        CollectionManager::getResourcesCollection($serverName)->isNotEmpty(),
                     ),
                     'serverInfo' => [
                         'name' => $serverName,
@@ -95,7 +97,7 @@ class McpHandler
                 $this->sendMessage($result);
                 break;
             case 'tools/call':
-                ['class' => $class, 'method' => $method] = McpCollector::getMethodByName($data['params']['name'], $serverName);
+                ['class' => $class, 'method' => $method] = McpCollector::getMethodByIndex($data['params']['name'], $serverName);
                 $class = $this->container->get($class);
                 $result = $class->{$method}(...$data['params']['arguments']);
 
@@ -105,7 +107,15 @@ class McpHandler
                 $this->sendMessage(['tools' => CollectionManager::getToolsCollection($serverName)]);
                 break;
             case 'resources/list':
-//                $this->sendMessage(['tools' => CollectionManager::getResourcesCollection($serverName)]);
+                $this->sendMessage(['resources' => CollectionManager::getResourcesCollection($serverName)]);
+                break;
+            case 'resources/read':
+                /** @var resource $annotation */
+                ['class' => $class, 'method' => $method, 'annotation' => $annotation] = McpCollector::getMethodByIndex($data['params']['uri'], $serverName);
+                $class = $this->container->get($class);
+                $result = $class->{$method}();
+
+                $this->sendMessage(['content' => [['uri' => $annotation->uri, 'mimeType' => $annotation->mimeType, 'text' => (string) $result]]]);
                 break;
             case 'notifications/initialized':
             default:

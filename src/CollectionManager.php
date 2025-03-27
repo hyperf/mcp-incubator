@@ -12,9 +12,10 @@ declare(strict_types=1);
 
 namespace Hyperf\Mcp;
 
-use Hyperf\Mcp\Annotation\Tool;
 use Hyperf\Collection\Collection;
 use Hyperf\Di\ReflectionManager;
+use Hyperf\Mcp\Annotation\Resource;
+use Hyperf\Mcp\Annotation\Tool;
 use ReflectionParameter;
 
 class CollectionManager
@@ -42,6 +43,27 @@ class CollectionManager
             ]);
         }
         return self::$collections[$serverName]['tools'];
+    }
+
+    public static function getResourcesCollection(string $serverName): Collection
+    {
+        if (isset(self::$collections[$serverName]['resources'])) {
+            return self::$collections[$serverName]['resources'];
+        }
+        $classes = McpCollector::getMethodsByAnnotation(Resource::class, $serverName);
+
+        self::$collections[$serverName]['resources'] = new Collection();
+        foreach ($classes as $class) {
+            /** @var array{class: string, method: string, annotation: resource} $class */
+            $annotation = $class['annotation'];
+            self::$collections[$serverName]['resources']->push([
+                'name' => $annotation->name,
+                'uri' => $annotation->uri,
+                'mimeType' => $annotation->mimeType,
+                'description' => $annotation->description,
+            ]);
+        }
+        return self::$collections[$serverName]['resources'];
     }
 
     private static function generateInputSchema(string $class, string $method): array

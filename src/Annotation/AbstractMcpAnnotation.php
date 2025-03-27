@@ -14,17 +14,13 @@ namespace Hyperf\Mcp\Annotation;
 
 use Attribute;
 use Hyperf\Di\Annotation\AbstractAnnotation;
-use Hyperf\Mcp\McpCollector;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 abstract class AbstractMcpAnnotation extends AbstractAnnotation
 {
-    public function __construct(public string $name, public string $description = '', public string $serverName = 'mcp-sse')
-    {
-    }
+    public string $name;
 
-    public function collectMethod(string $className, ?string $target): void
-    {
-        McpCollector::collectMethod($className, $target, static::class, $this);
-    }
+    public string $description = '';
+
+    public string $serverName = 'mcp-sse';
 }

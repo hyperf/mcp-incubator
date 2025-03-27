@@ -12,21 +12,23 @@ declare(strict_types=1);
 
 namespace Hyperf\Mcp;
 
-use Hyperf\Collection\Collection;
 use JsonSerializable;
 use stdClass;
 
 class Capabilities implements JsonSerializable
 {
-    public function __construct(protected ?Collection $tools = null)
+    public function __construct(protected ?bool $hasTools = null, protected ?bool $hasResources = null)
     {
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): stdClass
     {
         $capabilities = new stdClass();
-        if ($this->tools && $this->tools->isNotEmpty()) {
+        if ($this->hasTools) {
             $capabilities->tools = new stdClass();
+        }
+        if ($this->hasResources) {
+            $capabilities->resources = new stdClass();
         }
         return $capabilities;
     }

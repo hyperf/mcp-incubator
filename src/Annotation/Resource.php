@@ -16,14 +16,19 @@ use Attribute;
 use Hyperf\Mcp\McpCollector;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class Tool extends AbstractMcpAnnotation
+class Resource extends AbstractMcpAnnotation
 {
-    public function __construct(public string $name, public string $description = '', public string $serverName = 'mcp-sse')
-    {
+    public function __construct(
+        public string $uri,
+        public string $name,
+        public string $mimeType = 'text/plain',
+        public string $description = '',
+        public string $serverName = 'mcp-sse',
+    ) {
     }
 
     public function collectMethod(string $className, ?string $target): void
     {
-        McpCollector::collectMethod($className, $target, $this->name, $this);
+        McpCollector::collectMethod($className, $target, $this->uri, $this);
     }
 }
