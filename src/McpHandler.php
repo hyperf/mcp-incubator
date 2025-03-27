@@ -20,7 +20,6 @@ use Hyperf\Engine\Http\Stream;
 use Hyperf\HttpMessage\Server\Response as HttpResponse;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
-use Hyperf\HttpServer\Router\Dispatched;
 use Hyperf\Rpc\Protocol;
 use Hyperf\Rpc\ProtocolManager;
 use Hyperf\Rpc\Response;
@@ -54,8 +53,7 @@ class McpHandler
 
     public function handler(string $path = '/messages'): void
     {
-        $serverName = $this->getServerName();
-
+        $server = $this->getServer();
         $sessionId = $this->idGenerator->generate();
 
         $eventStream = (new EventStream($this->response->getConnection()))
@@ -63,20 +61,20 @@ class McpHandler
             ->write("data: {$path}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
 
         $fd = $this->getFd();
-        $this->connections[$serverName][$fd] = $eventStream;
-        $this->fdMaps[$serverName][$sessionId] = $fd;
-        if (empty($this->protocols[$serverName])) {
-            $this->protocols[$serverName] = new Protocol($this->container, $this->protocolManager, $serverName);
+        $this->connections[$server][$fd] = $eventStream;
+        $this->fdMaps[$server][$sessionId] = $fd;
+        if (empty($this->protocols[$server])) {
+            $this->protocols[$server] = new Protocol($this->container, $this->protocolManager, $server);
         }
 
         CoordinatorManager::until("fd:{$fd}")->yield();
 
-        unset($this->connections[$serverName][$fd], $this->fdMaps[$serverName][$sessionId]);
+        unset($this->connections[$server][$fd], $this->fdMaps[$server][$sessionId]);
     }
 
     public function message(): HttpResponse
     {
-        $protocol = $this->protocols[$serverName = $this->getServerName()];
+        $protocol = $this->protocols[$server = $this->getServer()];
         $data = $protocol->getPacker()->unpack($this->request->getBody()->getContents());
 
         switch ($data['method']) {
@@ -84,12 +82,12 @@ class McpHandler
                 $result = [
                     'protocolVersion' => $data['params']['protocolVersion'],
                     'capabilities' => new Capabilities(
-                        CollectionManager::getToolsCollection($serverName)->isNotEmpty(),
-                        CollectionManager::getResourcesCollection($serverName)->isNotEmpty(),
-                        CollectionManager::getPromptsCollection($serverName)->isNotEmpty(),
+                        CollectionManager::getToolsCollection($server)->isNotEmpty(),
+                        CollectionManager::getResourcesCollection($server)->isNotEmpty(),
+                        CollectionManager::getPromptsCollection($server)->isNotEmpty(),
                     ),
                     'serverInfo' => [
-                        'name' => $serverName,
+                        'name' => $server,
                         'version' => '1.0.0',
                     ],
                 ];
@@ -97,32 +95,32 @@ class McpHandler
                 $this->sendMessage($result);
                 break;
             case 'tools/call':
-                ['class' => $class, 'method' => $method] = McpCollector::getMethodByIndex($data['params']['name'], $serverName);
+                ['class' => $class, 'method' => $method] = McpCollector::getMethodByIndex($data['params']['name'], $server);
                 $class = $this->container->get($class);
                 $result = $class->{$method}(...$data['params']['arguments']);
 
                 $this->sendMessage(['content' => [['type' => 'text', 'text' => (string) $result]]]);
                 break;
             case 'tools/list':
-                $this->sendMessage(['tools' => CollectionManager::getToolsCollection($serverName)]);
+                $this->sendMessage(['tools' => CollectionManager::getToolsCollection($server)]);
                 break;
             case 'resources/list':
-                $this->sendMessage(['resources' => CollectionManager::getResourcesCollection($serverName)]);
+                $this->sendMessage(['resources' => CollectionManager::getResourcesCollection($server)]);
                 break;
             case 'resources/read':
                 /** @var Annotation\Resource $annotation */
-                ['class' => $class, 'method' => $method, 'annotation' => $annotation] = McpCollector::getMethodByIndex($data['params']['uri'], $serverName);
+                ['class' => $class, 'method' => $method, 'annotation' => $annotation] = McpCollector::getMethodByIndex($data['params']['uri'], $server);
                 $class = $this->container->get($class);
                 $result = $class->{$method}();
 
                 $this->sendMessage(['content' => [['uri' => $annotation->uri, 'mimeType' => $annotation->mimeType, 'text' => (string) $result]]]);
                 break;
             case 'prompts/list':
-                $this->sendMessage(['prompts' => CollectionManager::getPromptsCollection($serverName)]);
+                $this->sendMessage(['prompts' => CollectionManager::getPromptsCollection($server)]);
                 break;
             case 'prompts/get':
                 /** @var Annotation\Prompt $annotation */
-                ['class' => $class, 'method' => $method, 'annotation' => $annotation] = McpCollector::getMethodByIndex($data['params']['name'], $serverName);
+                ['class' => $class, 'method' => $method, 'annotation' => $annotation] = McpCollector::getMethodByIndex($data['params']['name'], $server);
                 $class = $this->container->get($class);
                 $result = $class->{$method}(...$data['params']['arguments']);
 
@@ -137,18 +135,19 @@ class McpHandler
 
     private function sendMessage($result): void
     {
-        $protocol = $this->protocols[$this->getServerName()];
+        $server = $this->getServer();
+        $protocol = $this->protocols[$server];
         $data = $protocol->getPacker()->unpack($this->request->getBody()->getContents());
         $result = $protocol->getDataFormatter()->formatResponse(new Response($data['id'], $result));
         $result = $protocol->getPacker()->pack($result);
 
-        $fd = $this->fdMaps[$this->getServerName()][$this->request->input('sessionId')];
-        $this->connections[$this->getServerName()][$fd]->write($result);
+        $fd = $this->fdMaps[$server][$this->request->input('sessionId')];
+        $this->connections[$server][$fd]->write($result);
     }
 
-    private function getServerName(): string
+    private function getServer(): string
     {
-        return $this->request->getAttribute(Dispatched::class)->serverName;
+        return $this->request->getUri()->getPath();
     }
 
     private function getFd(): int

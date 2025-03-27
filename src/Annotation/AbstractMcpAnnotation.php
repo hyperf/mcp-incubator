@@ -21,7 +21,7 @@ abstract class AbstractMcpAnnotation extends AbstractAnnotation
 
     public string $description = '';
 
-    public string $serverName = 'mcp-sse';
+    public string $server = 'default';
 
     public string $className;
 

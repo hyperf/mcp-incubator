@@ -23,20 +23,20 @@ class McpCollector extends MetadataCollector
     public static function collectMethod(string $class, string $method, string $index, AbstractMcpAnnotation $value): void
     {
         $annotation = $value::class;
-        if (static::$container[$value->serverName]['_index'][$index] ?? null) {
+        if (static::$container[$value->server]['_index'][$index] ?? null) {
             throw new InvalidArgumentException("{$annotation} index {$index} is exist!");
         }
-        static::$container[$value->serverName][$annotation][$class][$method] = $value;
-        static::$container[$value->serverName]['_index'][$index] = ['class' => $class, 'method' => $method, 'annotation' => $value];
+        static::$container[$value->server][$annotation][$class][$method] = $value;
+        static::$container[$value->server]['_index'][$index] = ['class' => $class, 'method' => $method, 'annotation' => $value];
     }
 
     /**
      * @param class-string<AbstractMcpAnnotation> $annotation
      */
-    public static function getMethodsByAnnotation(string $annotation, string $serverName = 'mcp-sse'): array
+    public static function getMethodsByAnnotation(string $annotation, string $server = 'default'): array
     {
         $result = [];
-        foreach (static::$container[$serverName][$annotation] ?? [] as $class => $metadata) {
+        foreach (static::$container[$server][$annotation] ?? [] as $class => $metadata) {
             foreach ($metadata as $method => $value) {
                 $result[] = ['class' => $class, 'method' => $method, 'annotation' => $value];
             }
@@ -44,8 +44,8 @@ class McpCollector extends MetadataCollector
         return $result;
     }
 
-    public static function getMethodByIndex(string $index, string $serverName = 'mcp-sse'): ?array
+    public static function getMethodByIndex(string $index, string $server = 'default'): ?array
     {
-        return static::$container[$serverName]['_index'][$index] ?? null;
+        return static::$container[$server]['_index'][$index] ?? null;
     }
 }

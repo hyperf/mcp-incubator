@@ -20,8 +20,11 @@ use ReflectionParameter;
 #[Attribute(Attribute::TARGET_METHOD)]
 class Tool extends AbstractMcpAnnotation
 {
-    public function __construct(public string $name, public string $description = '', public string $serverName = 'mcp-sse')
-    {
+    public function __construct(
+        public string $name,
+        public string $description = '',
+        public string $server = 'default'
+    ) {
     }
 
     public function collectMethod(string $className, ?string $target): void

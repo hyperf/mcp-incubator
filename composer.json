@@ -33,6 +33,6 @@
     },
     "scripts": {
         "cs-fix": "php-cs-fixer fix $1",
-        "analyse": "phpstan analyse --memory-limit=1024M -l max $1"
+        "analyse": "@php vendor/bin/phpstan analyse --memory-limit=-1"
     }
 }
