@@ -31,4 +31,14 @@ class Resource extends AbstractMcpAnnotation
     {
         McpCollector::collectMethod($className, $target, $this->uri, $this);
     }
+
+    public function toSchema(): array
+    {
+        return [
+            'name' => $this->name,
+            'uri' => $this->uri,
+            'mimeType' => $this->mimeType,
+            'description' => $this->description,
+        ];
+    }
 }

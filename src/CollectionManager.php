@@ -13,12 +13,10 @@ declare(strict_types=1);
 namespace Hyperf\Mcp;
 
 use Hyperf\Collection\Collection;
-use Hyperf\Di\ReflectionManager;
-use Hyperf\Mcp\Annotation\Description;
+use Hyperf\Mcp\Annotation\AbstractMcpAnnotation;
 use Hyperf\Mcp\Annotation\Prompt;
 use Hyperf\Mcp\Annotation\Resource;
 use Hyperf\Mcp\Annotation\Tool;
-use ReflectionParameter;
 
 class CollectionManager
 {
@@ -27,114 +25,36 @@ class CollectionManager
      */
     protected static array $collections = [];
 
+    /**
+     * @param class-string<AbstractMcpAnnotation> $annotation
+     */
+    public static function getCollection(string $serverName, string $annotation): Collection
+    {
+        if (isset(self::$collections[$serverName][$annotation])) {
+            return self::$collections[$serverName][$annotation];
+        }
+        $classes = McpCollector::getMethodsByAnnotation($annotation, $serverName);
+
+        self::$collections[$serverName][$annotation] = new Collection();
+        foreach ($classes as $class) {
+            /* @var array{class: string, method: string, annotation: AbstractMcpAnnotation} $class */
+            self::$collections[$serverName][$annotation]->push($class['annotation']->toSchema());
+        }
+        return self::$collections[$serverName][$annotation];
+    }
+
     public static function getToolsCollection(string $serverName): Collection
     {
-        if (isset(self::$collections[$serverName]['tools'])) {
-            return self::$collections[$serverName]['tools'];
-        }
-        $classes = McpCollector::getMethodsByAnnotation(Tool::class, $serverName);
-
-        self::$collections[$serverName]['tools'] = new Collection();
-        foreach ($classes as $class) {
-            /** @var array{class: string, method: string, annotation: Tool} $class */
-            $annotation = $class['annotation'];
-            self::$collections[$serverName]['tools']->push([
-                'name' => $annotation->name,
-                'description' => $annotation->description,
-                'inputSchema' => self::generateInputSchema($class['class'], $class['method']),
-            ]);
-        }
-        return self::$collections[$serverName]['tools'];
+        return self::getCollection($serverName, Tool::class);
     }
 
     public static function getResourcesCollection(string $serverName): Collection
     {
-        if (isset(self::$collections[$serverName]['resources'])) {
-            return self::$collections[$serverName]['resources'];
-        }
-        $classes = McpCollector::getMethodsByAnnotation(Resource::class, $serverName);
-
-        self::$collections[$serverName]['resources'] = new Collection();
-        foreach ($classes as $class) {
-            /** @var array{class: string, method: string, annotation: resource} $class */
-            $annotation = $class['annotation'];
-            self::$collections[$serverName]['resources']->push([
-                'name' => $annotation->name,
-                'uri' => $annotation->uri,
-                'mimeType' => $annotation->mimeType,
-                'description' => $annotation->description,
-            ]);
-        }
-        return self::$collections[$serverName]['resources'];
+        return self::getCollection($serverName, Resource::class);
     }
 
     public static function getPromptsCollection(string $serverName): Collection
     {
-        if (isset(self::$collections[$serverName]['prompts'])) {
-            return self::$collections[$serverName]['prompts'];
-        }
-        $classes = McpCollector::getMethodsByAnnotation(Prompt::class, $serverName);
-
-        self::$collections[$serverName]['prompts'] = new Collection();
-        foreach ($classes as $class) {
-            /** @var array{class: string, method: string, annotation: Prompt} $class */
-            $annotation = $class['annotation'];
-            self::$collections[$serverName]['prompts']->push([
-                'name' => $annotation->name,
-                'description' => $annotation->description,
-                'arguments' => self::generateArguments($class['class'], $class['method']),
-            ]);
-        }
-        return self::$collections[$serverName]['prompts'];
-    }
-
-    private static function generateInputSchema(string $class, string $method): array
-    {
-        $reflection = ReflectionManager::reflectMethod($class, $method);
-        $parameters = $reflection->getParameters();
-        $properties = [];
-        foreach ($parameters as $parameter) {
-            $type = $parameter->getType()?->getName();
-            $type = match ($type) {
-                'int' => 'integer',
-                'float' => 'number',
-                'bool' => 'boolean',
-                default => $type,
-            };
-            $properties[$parameter->getName()] = ['type' => $type, 'description' => self::getDescription($parameter)];
-        }
-        $required = array_filter(array_map(fn (ReflectionParameter $parameter) => $parameter->isOptional() ? null : $parameter->getName(), $parameters));
-        return [
-            'type' => 'object',
-            'properties' => $properties,
-            'required' => $required,
-            'additionalProperties' => false,
-            '$schema' => 'http://json-schema.org/draft-07/schema#',
-        ];
-    }
-
-    private static function generateArguments(mixed $class, mixed $method): array
-    {
-        $reflection = ReflectionManager::reflectMethod($class, $method);
-        $parameters = $reflection->getParameters();
-        $arguments = [];
-        foreach ($parameters as $parameter) {
-            $arguments[] = [
-                'name' => $parameter->getName(),
-                'description' => self::getDescription($parameter),
-                'required' => ! $parameter->isOptional(),
-            ];
-        }
-        return $arguments;
-    }
-
-    private static function getDescription(ReflectionParameter $parameter): string
-    {
-        foreach ($parameter->getAttributes() as $attribute) {
-            if ($attribute->getName() === Description::class) {
-                return $attribute->newInstance()->description;
-            }
-        }
-        return '';
+        return self::getCollection($serverName, Prompt::class);
     }
 }

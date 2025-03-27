@@ -12,10 +12,9 @@ declare(strict_types=1);
 
 namespace Hyperf\Mcp\Annotation;
 
-use Attribute;
 use Hyperf\Di\Annotation\AbstractAnnotation;
+use ReflectionParameter;
 
-#[Attribute(Attribute::TARGET_METHOD)]
 abstract class AbstractMcpAnnotation extends AbstractAnnotation
 {
     public string $name;
@@ -23,4 +22,20 @@ abstract class AbstractMcpAnnotation extends AbstractAnnotation
     public string $description = '';
 
     public string $serverName = 'mcp-sse';
+
+    public string $className;
+
+    public string $target;
+
+    abstract public function toSchema(): array;
+
+    protected static function getDescription(ReflectionParameter $parameter): string
+    {
+        foreach ($parameter->getAttributes() as $attribute) {
+            if ($attribute->getName() === Description::class) {
+                return $attribute->newInstance()->description;
+            }
+        }
+        return '';
+    }
 }
