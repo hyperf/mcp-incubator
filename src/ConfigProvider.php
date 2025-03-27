@@ -22,10 +22,10 @@ class ConfigProvider
     {
         return [
             'dependencies' => [
-                IdGeneratorInterface::class => UniqidIdGenerator::class
+                IdGeneratorInterface::class => UniqidIdGenerator::class,
             ],
             'listeners' => [
-                RegisterProtocolListener::class
+                RegisterProtocolListener::class,
             ],
             'annotations' => [
                 'scan' => [

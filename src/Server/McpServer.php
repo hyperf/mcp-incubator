@@ -14,6 +14,7 @@ namespace Hyperf\Mcp\Server;
 
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\HttpServer\Server;
+use Hyperf\Mcp\Exception\Handler\McpSseExceptionHandler;
 
 class McpServer extends Server
 {
@@ -27,5 +28,12 @@ class McpServer extends Server
     public function getVersion(): string
     {
         return $this->version;
+    }
+
+    protected function getDefaultExceptionHandler(): array
+    {
+        return [
+            McpSseExceptionHandler::class,
+        ];
     }
 }
