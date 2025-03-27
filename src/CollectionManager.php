@@ -14,6 +14,8 @@ namespace Hyperf\Mcp;
 
 use Hyperf\Collection\Collection;
 use Hyperf\Di\ReflectionManager;
+use Hyperf\Mcp\Annotation\Description;
+use Hyperf\Mcp\Annotation\Prompt;
 use Hyperf\Mcp\Annotation\Resource;
 use Hyperf\Mcp\Annotation\Tool;
 use ReflectionParameter;
@@ -66,6 +68,26 @@ class CollectionManager
         return self::$collections[$serverName]['resources'];
     }
 
+    public static function getPromptsCollection(string $serverName): Collection
+    {
+        if (isset(self::$collections[$serverName]['prompts'])) {
+            return self::$collections[$serverName]['prompts'];
+        }
+        $classes = McpCollector::getMethodsByAnnotation(Prompt::class, $serverName);
+
+        self::$collections[$serverName]['prompts'] = new Collection();
+        foreach ($classes as $class) {
+            /** @var array{class: string, method: string, annotation: Prompt} $class */
+            $annotation = $class['annotation'];
+            self::$collections[$serverName]['prompts']->push([
+                'name' => $annotation->name,
+                'description' => $annotation->description,
+                'arguments' => self::generateArguments($class['class'], $class['method']),
+            ]);
+        }
+        return self::$collections[$serverName]['prompts'];
+    }
+
     private static function generateInputSchema(string $class, string $method): array
     {
         $reflection = ReflectionManager::reflectMethod($class, $method);
@@ -79,7 +101,7 @@ class CollectionManager
                 'bool' => 'boolean',
                 default => $type,
             };
-            $properties[$parameter->getName()] = ['type' => $type];
+            $properties[$parameter->getName()] = ['type' => $type, 'description' => self::getDescription($parameter)];
         }
         $required = array_filter(array_map(fn (ReflectionParameter $parameter) => $parameter->isOptional() ? null : $parameter->getName(), $parameters));
         return [
@@ -89,5 +111,30 @@ class CollectionManager
             'additionalProperties' => false,
             '$schema' => 'http://json-schema.org/draft-07/schema#',
         ];
+    }
+
+    private static function generateArguments(mixed $class, mixed $method): array
+    {
+        $reflection = ReflectionManager::reflectMethod($class, $method);
+        $parameters = $reflection->getParameters();
+        $arguments = [];
+        foreach ($parameters as $parameter) {
+            $arguments[] = [
+                'name' => $parameter->getName(),
+                'description' => self::getDescription($parameter),
+                'required' => ! $parameter->isOptional(),
+            ];
+        }
+        return $arguments;
+    }
+
+    private static function getDescription(ReflectionParameter $parameter): string
+    {
+        foreach ($parameter->getAttributes() as $attribute) {
+            if ($attribute->getName() === Description::class) {
+                return $attribute->newInstance()->description;
+            }
+        }
+        return '';
     }
 }
