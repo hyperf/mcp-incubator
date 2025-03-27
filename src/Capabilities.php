@@ -17,8 +17,11 @@ use stdClass;
 
 class Capabilities implements JsonSerializable
 {
-    public function __construct(protected ?bool $hasTools = null, protected ?bool $hasResources = null)
-    {
+    public function __construct(
+        protected ?bool $hasTools = null,
+        protected ?bool $hasResources = null,
+        protected ?bool $hasPrompts = null,
+    ) {
     }
 
     public function jsonSerialize(): stdClass
@@ -29,6 +32,9 @@ class Capabilities implements JsonSerializable
         }
         if ($this->hasResources) {
             $capabilities->resources = new stdClass();
+        }
+        if ($this->hasPrompts) {
+            $capabilities->prompts = new stdClass();
         }
         return $capabilities;
     }

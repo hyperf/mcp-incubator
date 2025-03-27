@@ -86,6 +86,7 @@ class McpHandler
                     'capabilities' => new Capabilities(
                         CollectionManager::getToolsCollection($serverName)->isNotEmpty(),
                         CollectionManager::getResourcesCollection($serverName)->isNotEmpty(),
+                        CollectionManager::getPromptsCollection($serverName)->isNotEmpty(),
                     ),
                     'serverInfo' => [
                         'name' => $serverName,
