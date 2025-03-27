@@ -18,7 +18,8 @@
         "hyperf/framework": "^3.1"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.73"
+        "friendsofphp/php-cs-fixer": "^3.73",
+        "phpstan/phpstan": "^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -29,5 +30,9 @@
         "hyperf": {
             "config": "Hyperf\\Mcp\\ConfigProvider"
         }
+    },
+    "scripts": {
+        "cs-fix": "php-cs-fixer fix $1",
+        "analyse": "phpstan analyse --memory-limit=1024M -l max $1"
     }
 }
