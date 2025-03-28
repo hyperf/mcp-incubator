@@ -15,7 +15,7 @@ namespace Hyperf\Mcp\Annotation;
 use Hyperf\Di\Annotation\AbstractAnnotation;
 use ReflectionParameter;
 
-abstract class AbstractMcpAnnotation extends AbstractAnnotation
+abstract class McpAnnotation extends AbstractAnnotation
 {
     public string $name;
 

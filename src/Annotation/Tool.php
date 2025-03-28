@@ -18,7 +18,7 @@ use Hyperf\Mcp\McpCollector;
 use ReflectionParameter;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class Tool extends AbstractMcpAnnotation
+class Tool extends McpAnnotation
 {
     public function __construct(public string $name, public string $description = '', public string $serverName = 'mcp-sse')
     {

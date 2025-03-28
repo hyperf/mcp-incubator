@@ -16,7 +16,7 @@ use Attribute;
 use Hyperf\Mcp\McpCollector;
 
 #[Attribute(Attribute::TARGET_METHOD)]
-class Resource extends AbstractMcpAnnotation
+class Resource extends McpAnnotation
 {
     public function __construct(
         public string $uri,
