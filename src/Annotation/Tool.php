@@ -49,6 +49,7 @@ class Tool extends McpAnnotation
         $reflection = ReflectionManager::reflectMethod($this->className, $this->target);
         $parameters = $reflection->getParameters();
         $properties = [];
+
         foreach ($parameters as $parameter) {
             $type = $parameter->getType()?->getName(); // @phpstan-ignore method.notFound
             $type = match ($type) {
@@ -57,9 +58,16 @@ class Tool extends McpAnnotation
                 'bool' => 'boolean',
                 default => $type,
             };
-            $properties[$parameter->getName()] = ['type' => $type, 'description' => self::getDescription($parameter)];
+            $properties[$parameter->getName()] = [
+                'type' => $type,
+                'description' => self::getDescription($parameter),
+            ];
         }
-        $required = array_filter(array_map(fn (ReflectionParameter $parameter) => $parameter->isOptional() ? null : $parameter->getName(), $parameters));
+
+        $required = array_filter(
+            array_map(fn (ReflectionParameter $parameter) => $parameter->isOptional() ? null : $parameter->getName(), $parameters)
+        );
+
         return [
             'type' => 'object',
             'properties' => $properties,

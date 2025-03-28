@@ -49,6 +49,7 @@ class Prompt extends McpAnnotation
         $reflection = ReflectionManager::reflectMethod($this->className, $this->target);
         $parameters = $reflection->getParameters();
         $arguments = [];
+
         foreach ($parameters as $parameter) {
             $arguments[] = [
                 'name' => $parameter->getName(),
