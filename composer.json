@@ -18,7 +18,8 @@
         "hyperf/framework": "^3.1"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.73"
+        "friendsofphp/php-cs-fixer": "^3.73",
+        "phpstan/phpstan": "^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -31,6 +32,7 @@
         }
     },
     "scripts": {
-        "cs-fix": "php-cs-fixer fix $1"
+        "cs-fix": "php-cs-fixer fix $1",
+        "analyse": "@php vendor/bin/phpstan analyse --memory-limit 512M -c phpstan.neon"
     }
 }
