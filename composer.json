@@ -29,5 +29,8 @@
         "hyperf": {
             "config": "Hyperf\\Mcp\\ConfigProvider"
         }
+    },
+    "scripts": {
+        "cs-fix": "php-cs-fixer fix $1"
     }
 }
