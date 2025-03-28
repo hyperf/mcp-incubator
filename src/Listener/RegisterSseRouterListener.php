@@ -39,7 +39,7 @@ class RegisterSseRouterListener implements ListenerInterface
 
     public function process(object $event): void
     {
-        foreach ($this->config->get('servers', []) as $name => $server) {
+        foreach ($this->config->get('server.servers', []) as $name => $server) {
             $serverName = $server['name'] ?? $name;
             $path = $server['options']['mcp_path'] ?? '/';
 
@@ -47,6 +47,7 @@ class RegisterSseRouterListener implements ListenerInterface
                 [$class] = $callback;
                 if (is_a($class, McpServer::class, true)) {
                     $this->registerRouter($serverName, $path);
+                    break;
                 }
             }
         }
