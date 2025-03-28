@@ -1,0 +1,22 @@
+includes:
+
+parameters:
+  level: 6
+  parallel:
+    jobSize: 20
+    maximumNumberOfProcesses: 32
+    minimumNumberOfJobsPerProcess: 2
+  reportUnmatchedIgnoredErrors: false
+  paths:
+    - app/
+    - config/
+    - storage/languages
+  scanFiles:
+  excludePaths:
+  ignoreErrors:
+    -
+      identifier: missingType.iterableValue
+    -
+      identifier: missingType.generics
+    -
+      '#invalid type Swow\\Psr7\\Server\\ServerConnection#'

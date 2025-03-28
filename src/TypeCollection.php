@@ -18,7 +18,7 @@ use Hyperf\Mcp\Annotation\Prompt;
 use Hyperf\Mcp\Annotation\Resource;
 use Hyperf\Mcp\Annotation\Tool;
 
-class CollectionManager
+class TypeCollection
 {
     /**
      * @var Collection[][]
@@ -33,9 +33,11 @@ class CollectionManager
         if (isset(self::$collections[$serverName][$annotation])) {
             return self::$collections[$serverName][$annotation];
         }
+
         $classes = McpCollector::getMethodsByAnnotation($annotation, $serverName);
 
         self::$collections[$serverName][$annotation] = new Collection();
+
         foreach ($classes as $class) {
             /* @var array{class: string, method: string, annotation: AbstractMcpAnnotation} $class */
             self::$collections[$serverName][$annotation]->push($class['annotation']->toSchema());
@@ -43,17 +45,17 @@ class CollectionManager
         return self::$collections[$serverName][$annotation];
     }
 
-    public static function getToolsCollection(string $serverName): Collection
+    public static function getTools(string $serverName): Collection
     {
         return self::getCollection($serverName, Tool::class);
     }
 
-    public static function getResourcesCollection(string $serverName): Collection
+    public static function getResources(string $serverName): Collection
     {
         return self::getCollection($serverName, Resource::class);
     }
 
-    public static function getPromptsCollection(string $serverName): Collection
+    public static function getPrompts(string $serverName): Collection
     {
         return self::getCollection($serverName, Prompt::class);
     }

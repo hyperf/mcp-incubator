@@ -95,9 +95,9 @@ class McpHandler
                 $result = [
                     'protocolVersion' => '2024-11-05',
                     'capabilities' => new Capabilities(
-                        CollectionManager::getToolsCollection($serverName)->isNotEmpty(),
-                        CollectionManager::getResourcesCollection($serverName)->isNotEmpty(),
-                        CollectionManager::getPromptsCollection($serverName)->isNotEmpty(),
+                        TypeCollection::getTools($serverName)->isNotEmpty(),
+                        TypeCollection::getResources($serverName)->isNotEmpty(),
+                        TypeCollection::getPrompts($serverName)->isNotEmpty(),
                     ),
                     'serverInfo' => [
                         'name' => $serverName,
@@ -115,10 +115,10 @@ class McpHandler
                 $this->sendMessage(['content' => [['type' => 'text', 'text' => (string) $result]]]);
                 break;
             case 'tools/list':
-                $this->sendMessage(['tools' => CollectionManager::getToolsCollection($serverName)]);
+                $this->sendMessage(['tools' => TypeCollection::getTools($serverName)]);
                 break;
             case 'resources/list':
-                $this->sendMessage(['resources' => CollectionManager::getResourcesCollection($serverName)]);
+                $this->sendMessage(['resources' => TypeCollection::getResources($serverName)]);
                 break;
             case 'resources/read':
                 /** @var Annotation\Resource $annotation */
@@ -129,7 +129,7 @@ class McpHandler
                 $this->sendMessage(['content' => [['uri' => $annotation->uri, 'mimeType' => $annotation->mimeType, 'text' => (string) $result]]]);
                 break;
             case 'prompts/list':
-                $this->sendMessage(['prompts' => CollectionManager::getPromptsCollection($serverName)]);
+                $this->sendMessage(['prompts' => TypeCollection::getPrompts($serverName)]);
                 break;
             case 'prompts/get':
                 /** @var Annotation\Prompt $annotation */
