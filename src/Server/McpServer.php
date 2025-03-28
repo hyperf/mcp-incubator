@@ -12,11 +12,12 @@ declare(strict_types=1);
 
 namespace Hyperf\Mcp\Server;
 
+use Hyperf\Contract\OnCloseInterface;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\HttpServer\Server;
 use Hyperf\Mcp\Exception\Handler\McpSseExceptionHandler;
 
-class McpServer extends Server
+class McpServer extends Server implements OnCloseInterface
 {
     protected string $version = '1.0.0';
 
