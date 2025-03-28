@@ -14,13 +14,18 @@ namespace Hyperf\Mcp\Annotation;
 
 use Attribute;
 use Hyperf\Di\ReflectionManager;
+use Hyperf\Mcp\Constants;
 use Hyperf\Mcp\McpCollector;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class Prompt extends McpAnnotation
 {
-    public function __construct(public string $name, public string $description = '', public string $role = 'user', public string $serverName = 'mcp-sse')
-    {
+    public function __construct(
+        public string $name,
+        public string $description = '',
+        public string $role = 'user',
+        public string $serverName = Constants::DEFAULT_SERVER_NAME
+    ) {
     }
 
     public function collectMethod(string $className, ?string $target): void

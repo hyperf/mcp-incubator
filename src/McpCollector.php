@@ -33,7 +33,7 @@ class McpCollector extends MetadataCollector
     /**
      * @param class-string<McpAnnotation> $annotation
      */
-    public static function getMethodsByAnnotation(string $annotation, string $serverName = 'mcp-sse'): array
+    public static function getMethodsByAnnotation(string $annotation, string $serverName = Constants::DEFAULT_SERVER_NAME): array
     {
         $result = [];
         foreach (static::$container[$serverName][$annotation] ?? [] as $class => $metadata) {
@@ -44,7 +44,7 @@ class McpCollector extends MetadataCollector
         return $result;
     }
 
-    public static function getMethodByIndex(string $index, string $serverName = 'mcp-sse'): ?array
+    public static function getMethodByIndex(string $index, string $serverName = Constants::DEFAULT_SERVER_NAME): ?array
     {
         return static::$container[$serverName]['_index'][$index] ?? null;
     }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Hyperf\Mcp\Annotation;
 
 use Hyperf\Di\Annotation\AbstractAnnotation;
+use Hyperf\Mcp\Constants;
 use ReflectionParameter;
 
 abstract class McpAnnotation extends AbstractAnnotation
@@ -21,7 +22,7 @@ abstract class McpAnnotation extends AbstractAnnotation
 
     public string $description = '';
 
-    public string $serverName = 'mcp-sse';
+    public string $serverName = Constants::DEFAULT_SERVER_NAME;
 
     public string $className;
 
@@ -36,6 +37,7 @@ abstract class McpAnnotation extends AbstractAnnotation
                 return $attribute->newInstance()->description;
             }
         }
+
         return '';
     }
 }

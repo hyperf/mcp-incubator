@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Hyperf\Mcp\Annotation;
 
 use Attribute;
+use Hyperf\Mcp\Constants;
 use Hyperf\Mcp\McpCollector;
 
 #[Attribute(Attribute::TARGET_METHOD)]
@@ -21,9 +22,9 @@ class Resource extends McpAnnotation
     public function __construct(
         public string $uri,
         public string $name,
-        public string $mimeType = 'text/plain',
         public string $description = '',
-        public string $serverName = 'mcp-sse',
+        public string $mimeType = 'text/plain',
+        public string $serverName = Constants::DEFAULT_SERVER_NAME,
     ) {
     }
 
