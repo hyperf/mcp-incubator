@@ -22,8 +22,7 @@ use Hyperf\Mcp\Server\McpServer;
 return [
     'type' => Hyperf\Server\CoroutineServer::class,
     'servers' => [
-        [
-            'name' => 'mcp-sse',
+        'mcp-sse' => [
             'type' => Server::SERVER_HTTP,
             'host' => '0.0.0.0',
             'port' => 3000,
