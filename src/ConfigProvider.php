@@ -13,9 +13,9 @@ declare(strict_types=1);
 namespace Hyperf\Mcp;
 
 use Hyperf\Mcp\Contract\IdGeneratorInterface;
+use Hyperf\Mcp\IdGenerator\UniqidIdGenerator;
 use Hyperf\Mcp\Listener\RegisterProtocolListener;
 use Hyperf\Mcp\Listener\RegisterSseRouterListener;
-use Hyperf\Mcp\IdGenerator\UniqidIdGenerator;
 
 class ConfigProvider
 {

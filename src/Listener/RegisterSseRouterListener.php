@@ -1,8 +1,19 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
+
 namespace Hyperf\Mcp\Listener;
 
 use Hyperf\Context\RequestContext;
+use Hyperf\Contract\ConfigInterface;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BootApplication;
 use Hyperf\HttpServer\Router\DispatcherFactory;
@@ -14,9 +25,10 @@ class RegisterSseRouterListener implements ListenerInterface
 {
     public function __construct(
         protected DispatcherFactory $dispatcherFactory, // Don't remove this line
-        protected \Hyperf\Contract\ConfigInterface $config,
+        protected ConfigInterface $config,
         protected McpHandler $mcpHandler
-    ) {}
+    ) {
+    }
 
     public function listen(): array
     {
@@ -25,7 +37,8 @@ class RegisterSseRouterListener implements ListenerInterface
         ];
     }
 
-    public function process(object $event): void {
+    public function process(object $event): void
+    {
         foreach ($this->config->get('servers', []) as $name => $server) {
             $serverName = $server['name'] ?? $name;
             $path = $server['options']['mcp_path'] ?? '/';
@@ -39,9 +52,10 @@ class RegisterSseRouterListener implements ListenerInterface
         }
     }
 
-    protected function registerRouter($serverName, string $path) {
-        Router::addServer($serverName, function() use ($path)  {
-            Router::addRoute(['GET', 'POST'], $path, function() use ($path) {
+    protected function registerRouter($serverName, string $path)
+    {
+        Router::addServer($serverName, function () use ($path) {
+            Router::addRoute(['GET', 'POST'], $path, function () use ($path) {
                 match (RequestContext::get()->getMethod()) {
                     'GET' => $this->mcpHandler->handler($path),
                     'POST' => $this->mcpHandler->message(),

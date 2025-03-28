@@ -14,11 +14,11 @@ namespace Hyperf\Mcp\Listener;
 
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BootApplication;
-use Hyperf\Mcp\Protocol\DataFormatter;
-use Hyperf\Mcp\Protocol\Packer;
 use Hyperf\JsonRpc\JsonRpcNormalizer;
 use Hyperf\JsonRpc\JsonRpcTransporter;
 use Hyperf\JsonRpc\PathGenerator;
+use Hyperf\Mcp\Protocol\DataFormatter;
+use Hyperf\Mcp\Protocol\Packer;
 use Hyperf\Rpc\ProtocolManager;
 
 class RegisterProtocolListener implements ListenerInterface
