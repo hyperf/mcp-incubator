@@ -46,7 +46,7 @@ class Tool extends AbstractMcpAnnotation
         $parameters = $reflection->getParameters();
         $properties = [];
         foreach ($parameters as $parameter) {
-            $type = $parameter->getType()?->getName();
+            $type = $parameter->getType()?->getName(); // @phpstan-ignore method.notFound
             $type = match ($type) {
                 'int' => 'integer',
                 'float' => 'number',

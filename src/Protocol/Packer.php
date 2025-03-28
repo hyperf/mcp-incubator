@@ -17,12 +17,12 @@ use Hyperf\Contract\PackerInterface;
 
 class Packer implements PackerInterface
 {
-    public function pack($data): string
+    public function pack(mixed $data): string
     {
         return "event: message\ndata: " . Json::encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL . PHP_EOL;
     }
 
-    public function unpack(string $data)
+    public function unpack(string $data): mixed
     {
         return Json::decode($data);
     }

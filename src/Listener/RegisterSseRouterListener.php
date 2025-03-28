@@ -52,13 +52,14 @@ class RegisterSseRouterListener implements ListenerInterface
         }
     }
 
-    protected function registerRouter($serverName, string $path)
+    protected function registerRouter(string $serverName, string $path): void
     {
         Router::addServer($serverName, function () use ($path) {
             Router::addRoute(['GET', 'POST'], $path, function () use ($path) {
                 match (RequestContext::get()->getMethod()) {
                     'GET' => $this->mcpHandler->handler($path),
                     'POST' => $this->mcpHandler->message(),
+                    default => null,
                 };
             });
         });

@@ -16,6 +16,7 @@ use Hyperf\Engine\Http\Stream;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Server\Response as HttpResponse;
 use Hyperf\Mcp\McpHandler;
+use Psr\Http\Message\ResponseInterface;
 use Swow\Psr7\Message\ResponsePlusInterface;
 use Throwable;
 
@@ -25,7 +26,7 @@ class McpSseExceptionHandler extends ExceptionHandler
     {
     }
 
-    public function handle(Throwable $throwable, ResponsePlusInterface $response)
+    public function handle(Throwable $throwable, ResponsePlusInterface $response): ResponseInterface
     {
         $this->handler->sendErrorMessage($throwable);
         return (new HttpResponse())->setStatus(202)->setBody(new Stream('Accepted'));
