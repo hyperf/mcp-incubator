@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace Hyperf\Mcp;
 
 use Hyperf\Context\RequestContext;
-use Hyperf\Contract\IdGeneratorInterface;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\Engine\Http\EventStream;
 use Hyperf\Engine\Http\Stream;
@@ -21,13 +21,13 @@ use Hyperf\HttpMessage\Server\Response as HttpResponse;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\HttpServer\Router\Dispatched;
+use Hyperf\Mcp\Contract\IdGeneratorInterface;
 use Hyperf\Mcp\Protocol\DataFormatter;
 use Hyperf\Mcp\Protocol\Packer;
 use Hyperf\Rpc\ErrorResponse;
 use Hyperf\Rpc\Protocol;
 use Hyperf\Rpc\Response;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 use Throwable;
 
 class McpHandler
@@ -48,13 +48,13 @@ class McpHandler
     protected array $protocols;
 
     public function __construct(
+        protected ContainerInterface $container,
         protected RequestInterface $request,
         protected ResponseInterface $response,
-        protected IdGeneratorInterface $idGenerator,
-        protected ContainerInterface $container,
-        protected LoggerInterface $logger,
         protected Packer $packer,
         protected DataFormatter $dataFormatter,
+        protected IdGeneratorInterface $idGenerator,
+        protected StdoutLoggerInterface $logger,
     ) {
     }
 

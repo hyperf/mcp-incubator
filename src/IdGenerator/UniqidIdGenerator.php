@@ -14,6 +14,10 @@ namespace Hyperf\Mcp\IdGenerator;
 
 use Hyperf\Mcp\Contract\IdGeneratorInterface;
 
-class UniqidIdGenerator extends \Hyperf\Rpc\IdGenerator\UniqidIdGenerator implements IdGeneratorInterface
+class UniqidIdGenerator implements IdGeneratorInterface
 {
+    public function generate(): string
+    {
+        return uniqid();
+    }
 }
