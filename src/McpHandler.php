@@ -21,9 +21,10 @@ use Hyperf\HttpMessage\Server\Response as HttpResponse;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\HttpServer\Router\Dispatched;
+use Hyperf\Mcp\Protocol\DataFormatter;
+use Hyperf\Mcp\Protocol\Packer;
 use Hyperf\Rpc\ErrorResponse;
 use Hyperf\Rpc\Protocol;
-use Hyperf\Rpc\ProtocolManager;
 use Hyperf\Rpc\Response;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -37,7 +38,7 @@ class McpHandler
     public array $connections = [];
 
     /**
-     * @var array<string, int>
+     * @var array<string, array<string, int>>
      */
     public array $fdMaps = [];
 
@@ -51,41 +52,36 @@ class McpHandler
         protected ResponseInterface $response,
         protected IdGeneratorInterface $idGenerator,
         protected ContainerInterface $container,
-        protected ProtocolManager $protocolManager,
         protected LoggerInterface $logger,
+        protected Packer $packer,
+        protected DataFormatter $dataFormatter,
     ) {
     }
 
-    public function handler(string $path = '/messages'): void
+    public function handle(string $path = '/messages'): void
     {
         $serverName = $this->getServerName();
-
         $sessionId = $this->idGenerator->generate();
-
         $fd = $this->getFd();
 
         $this->logger->debug("McpSSE Request {$serverName} {$fd} {$sessionId}");
 
-        $eventStream = (new EventStream($this->response->getConnection()))
+        $eventStream = (new EventStream($this->response->getConnection())) // @phpstan-ignore method.notFound
             ->write('event: endpoint' . PHP_EOL)
             ->write("data: {$path}?sessionId={$sessionId}" . PHP_EOL . PHP_EOL);
 
         $this->connections[$serverName][$fd] = $eventStream;
         $this->fdMaps[$serverName][$sessionId] = $fd;
-        if (empty($this->protocols[$serverName])) {
-            $this->protocols[$serverName] = new Protocol($this->container, $this->protocolManager, $serverName);
-        }
 
         CoordinatorManager::until("fd:{$fd}")->yield();
 
         unset($this->connections[$serverName][$fd], $this->fdMaps[$serverName][$sessionId]);
     }
 
-    public function message(): HttpResponse
+    public function process(): HttpResponse
     {
         $serverName = $this->getServerName();
-        $protocol = $this->getProtocol();
-        $data = $protocol->getPacker()->unpack($this->request->getBody()->getContents());
+        $data = $this->packer->unpack($this->request->getBody()->getContents());
         $sessionId = $this->request->input('sessionId');
 
         $this->logger->debug("McpSSE Request {$serverName} {$this->getFd()} {$sessionId} {$data['method']}");
@@ -143,38 +139,34 @@ class McpHandler
             default:
                 break;
         }
+
         return (new HttpResponse())->setStatus(202)->setBody(new Stream('Accepted'));
     }
 
-    public function sendMessage($result): void
+    public function sendMessage(mixed $result): void
     {
-        $result = $this->getProtocol()->getDataFormatter()->formatResponse(new Response($this->getRequestId(), $result));
+        $result = $this->dataFormatter->formatResponse(new Response($this->getRequestId(), $result));
         $this->send($result);
     }
 
     public function sendErrorMessage(Throwable $throwable): void
     {
         $errorResponse = new ErrorResponse($this->getRequestId(), $throwable->getCode(), $throwable->getMessage(), $throwable);
-        $result = $this->getProtocol()->getDataFormatter()->formatErrorResponse($errorResponse);
+        $result = $this->dataFormatter->formatErrorResponse($errorResponse);
         $this->send($result);
     }
 
-    private function send($result): void
+    private function send(mixed $result): void
     {
-        $result = $this->getProtocol()->getPacker()->pack($result);
+        $result = $this->packer->pack($result);
         $fd = $this->fdMaps[$this->getServerName()][$this->request->input('sessionId')];
         $this->connections[$this->getServerName()][$fd]->write($result);
     }
 
     private function getRequestId(): int
     {
-        $data = $this->getProtocol()->getPacker()->unpack($this->request->getBody()->getContents());
+        $data = $this->packer->unpack($this->request->getBody()->getContents());
         return $data['id'];
-    }
-
-    private function getProtocol(): Protocol
-    {
-        return $this->protocols[$this->getServerName()];
     }
 
     private function getServerName(): string
@@ -184,6 +176,6 @@ class McpHandler
 
     private function getFd(): int
     {
-        return RequestContext::get()->getSwooleRequest()->fd;
+        return RequestContext::get()->getSwooleRequest()->fd; // @phpstan-ignore method.notFound
     }
 }
