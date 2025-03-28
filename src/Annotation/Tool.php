@@ -39,13 +39,11 @@ class Tool extends McpAnnotation
 
     public function toSchema(): array
     {
-        return tap([
+        return [
             'name' => $this->name,
             'description' => $this->description,
             'inputSchema' => $this->generateInputSchema(),
-        ], function($a) {
-            var_dump($a);
-        });
+        ];
     }
 
     private function generateInputSchema(): array
