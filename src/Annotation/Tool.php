@@ -18,6 +18,8 @@ use Hyperf\Mcp\Constants;
 use Hyperf\Mcp\McpCollector;
 use ReflectionParameter;
 
+use function Hyperf\Tappable\tap;
+
 #[Attribute(Attribute::TARGET_METHOD)]
 class Tool extends McpAnnotation
 {
@@ -37,11 +39,13 @@ class Tool extends McpAnnotation
 
     public function toSchema(): array
     {
-        return [
+        return tap([
             'name' => $this->name,
             'description' => $this->description,
             'inputSchema' => $this->generateInputSchema(),
-        ];
+        ], function($a) {
+            var_dump($a);
+        });
     }
 
     private function generateInputSchema(): array
@@ -51,7 +55,7 @@ class Tool extends McpAnnotation
         $properties = [];
 
         foreach ($parameters as $parameter) {
-            $type = $parameter->getType()?->getName(); // @phpstan-ignore method.notFound
+            $type = $parameter->getType()?->getName() ?? 'string'; // @phpstan-ignore method.notFound
             $type = match ($type) {
                 'int' => 'integer',
                 'float' => 'number',
