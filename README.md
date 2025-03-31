@@ -5,7 +5,7 @@
 ## 安装
 
 ```bash
-composer require hyperf/mcp
+composer require hyperf/mcp-incubator
 ```
 
 ## 使用

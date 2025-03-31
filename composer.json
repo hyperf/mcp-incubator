@@ -1,5 +1,5 @@
 {
-    "name": "hyperf/mcp",
+    "name": "hyperf/mcp-incubator",
     "description": "ModelContextProtocol for Hyperf",
     "keywords": [
         "php",
