@@ -54,7 +54,7 @@ class SseTransport implements TransportInterface
         }
         $result = $this->packer->pack($message);
         $fd = $this->fdMaps[$this->getServerName()][$this->request->input('sessionId')];
-        $this->connections[$this->getServerName()][$fd]->write($result);
+        $this->connections[$this->getServerName()][$fd]->write("event: message\ndata: {$result}\n\n");
     }
 
     public function readMessage(): Notification|Request

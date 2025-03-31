@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Hyperf\Mcp\Server\Transport;
 
-use Hyperf\Codec\Json;
+use Hyperf\Mcp\Server\Protocol\Packer;
 use Hyperf\Mcp\Transport\TransportInterface;
 use Hyperf\Mcp\Types\Message\MessageInterface;
 use Hyperf\Mcp\Types\Message\Notification;
@@ -28,20 +28,21 @@ class StdioTransport implements TransportInterface
 
     public function __construct(
         protected InputInterface $input,
-        protected OutputInterface $output
+        protected OutputInterface $output,
+        protected Packer $packer,
     ) {
         $this->helper = new QuestionHelper();
     }
 
     public function sendMessage(MessageInterface $message): void
     {
-        $this->output->writeln(Json::encode($message));
+        $this->output->writeln($this->packer->pack($message));
     }
 
     public function readMessage(): Notification|Request
     {
         $message = $this->helper->ask($this->input, $this->output, new Question(''));
-        $message = Json::decode($message);
+        $message = $this->packer->unpack($message);
         if (! isset($message['id'])) {
             return new Notification(...$message);
         }

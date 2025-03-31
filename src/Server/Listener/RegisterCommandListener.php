@@ -20,6 +20,7 @@ use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BootApplication;
 use Hyperf\Mcp\Server\Annotation\Server;
 use Hyperf\Mcp\Server\McpHandler;
+use Hyperf\Mcp\Server\Protocol\Packer;
 use Hyperf\Mcp\Server\Transport\StdioTransport;
 use Psr\Container\ContainerInterface;
 
@@ -60,8 +61,8 @@ class RegisterCommandListener implements ListenerInterface
 
                 public function handle()
                 {
-                    $transport = new StdioTransport($this->input, $this->output);
-                    $handler = new McpHandler($this->serverName, ApplicationContext::getContainer());
+                    $handler = new McpHandler($this->serverName, $container = ApplicationContext::getContainer());
+                    $transport = new StdioTransport($this->input, $this->output, $container->get(Packer::class));
                     while (true) {
                         $request = $transport->readMessage();
                         if ($response = $handler->handle($request)) {

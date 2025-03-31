@@ -19,7 +19,7 @@ class Packer implements PackerInterface
 {
     public function pack(mixed $data): string
     {
-        return "event: message\ndata: " . Json::encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL . PHP_EOL;
+        return Json::encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     public function unpack(string $data): mixed
