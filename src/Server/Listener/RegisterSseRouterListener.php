@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace Hyperf\Mcp\Listener;
+namespace Hyperf\Mcp\Server\Listener;
 
 use Hyperf\Context\RequestContext;
 use Hyperf\Contract\ConfigInterface;

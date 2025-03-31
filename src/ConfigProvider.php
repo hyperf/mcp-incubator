@@ -14,7 +14,8 @@ namespace Hyperf\Mcp;
 
 use Hyperf\Mcp\Contract\IdGeneratorInterface;
 use Hyperf\Mcp\IdGenerator\UniqidIdGenerator;
-use Hyperf\Mcp\Listener\RegisterSseRouterListener;
+use Hyperf\Mcp\Server\Listener\RegisterCommandListener;
+use Hyperf\Mcp\Server\Listener\RegisterSseRouterListener;
 
 class ConfigProvider
 {
@@ -25,6 +26,7 @@ class ConfigProvider
                 IdGeneratorInterface::class => UniqidIdGenerator::class,
             ],
             'listeners' => [
+                RegisterCommandListener::class,
                 RegisterSseRouterListener::class,
             ],
             'annotations' => [
