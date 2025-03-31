@@ -16,6 +16,7 @@ composer require hyperf/mcp
 ```php
 <?php
 
+use Hyperf\Mcp\Annotation\Tool;
 use Hyperf\Mcp\Server\Annotation\Server;
 
 #[Server(name: 'stdio', signature: 'mcp:command', description: '这是一个测试命令')]
@@ -67,6 +68,7 @@ return [
 ```php
 <?php
 
+use Hyperf\Mcp\Annotation\Tool;
 use Hyperf\Mcp\Server\Annotation\Server;
 
 #[Server(name: 'mcp-sse', description: '这是一个测试命令')]
