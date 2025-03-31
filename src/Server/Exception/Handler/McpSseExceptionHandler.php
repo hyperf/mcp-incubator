@@ -30,7 +30,6 @@ class McpSseExceptionHandler extends ExceptionHandler
 
     public function handle(Throwable $throwable, ResponsePlusInterface $response): ResponseInterface
     {
-        print_r($throwable);
         $this->transport->sendMessage(new ErrorResponse($this->transport->getRequestId(), '2.0', $throwable));
         return (new HttpResponse())->setStatus(202)->setBody(new Stream('Accepted'));
     }

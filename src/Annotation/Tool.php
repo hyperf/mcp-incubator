@@ -18,8 +18,6 @@ use Hyperf\Mcp\Constants;
 use Hyperf\Mcp\McpCollector;
 use ReflectionParameter;
 
-use function Hyperf\Tappable\tap;
-
 #[Attribute(Attribute::TARGET_METHOD)]
 class Tool extends McpAnnotation
 {
@@ -70,12 +68,12 @@ class Tool extends McpAnnotation
             array_map(fn (ReflectionParameter $parameter) => $parameter->isOptional() ? null : $parameter->getName(), $parameters)
         );
 
-        return [
+        return array_filter([
             'type' => 'object',
             'properties' => $properties,
             'required' => $required,
             'additionalProperties' => false,
             '$schema' => 'http://json-schema.org/draft-07/schema#',
-        ];
+        ]);
     }
 }
