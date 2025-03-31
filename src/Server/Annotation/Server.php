@@ -18,7 +18,7 @@ use Hyperf\Di\Annotation\AbstractAnnotation;
 #[Attribute(Attribute::TARGET_CLASS)]
 class Server extends AbstractAnnotation
 {
-    public function __construct(public $name, public ?string $signature = null, public string $description = '')
+    public function __construct(public $name, public ?string $signature = null, ?string $path = null, public string $description = '')
     {
     }
 }

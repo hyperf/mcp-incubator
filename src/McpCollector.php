@@ -20,11 +20,13 @@ class McpCollector extends MetadataCollector
 {
     protected static array $container = [];
 
+    protected static bool $init = false;
+
     public static function collectMethod(string $class, string $method, string $index, McpAnnotation $value): void
     {
         $annotation = $value::class;
         if (static::$container[$value->serverName]['_index'][$index] ?? null) {
-            throw new InvalidArgumentException("{$annotation} index {$index} is exist!");
+            throw new InvalidArgumentException("{$annotation} index {$index} is exist on {$value->serverName} !");
         }
         static::$container[$value->serverName][$annotation][$class][$method] = $value;
         static::$container[$value->serverName]['_index'][$index] = ['class' => $class, 'method' => $method, 'annotation' => $value];
@@ -47,5 +49,13 @@ class McpCollector extends MetadataCollector
     public static function getMethodByIndex(string $index, string $serverName = Constants::DEFAULT_SERVER_NAME): ?array
     {
         return static::$container[$serverName]['_index'][$index] ?? null;
+    }
+
+    public static function clear(?string $key = null): void
+    {
+        if (! self::$init) {
+            self::$init = true;
+            static::$container = [];
+        }
     }
 }

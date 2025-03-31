@@ -48,17 +48,20 @@ class RegisterCommandListener implements ListenerInterface
             $asCommand = new class($annotation) extends Command {
                 protected bool $coroutine = false;
 
+                protected string $serverName;
+
                 public function __construct(Server $annotation)
                 {
                     $this->signature = $annotation->signature;
                     $this->description = $annotation->description;
+                    $this->serverName = $annotation->name;
                     parent::__construct();
                 }
 
                 public function handle()
                 {
                     $transport = new StdioTransport($this->input, $this->output);
-                    $handler = new McpHandler('stdio', ApplicationContext::getContainer());
+                    $handler = new McpHandler($this->serverName, ApplicationContext::getContainer());
                     while (true) {
                         $request = $transport->readMessage();
                         if ($response = $handler->handle($request)) {

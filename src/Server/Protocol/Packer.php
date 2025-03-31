@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace Hyperf\Mcp\Protocol;
+namespace Hyperf\Mcp\Server\Protocol;
 
 use Hyperf\Codec\Json;
 use Hyperf\Contract\PackerInterface;

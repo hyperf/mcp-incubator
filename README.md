@@ -41,13 +41,37 @@ return [
 
 ## 使用
 
+### Stdio
+
+
 ```php
 <?php
 
+use Hyperf\Mcp\Server\Annotation\Server;
+
+#[Server(name: 'stdio', signature: 'mcp:command', description: '这是一个测试命令')]
 class Foo
 {
-    #[Tool(name: 'sum', description: '计算两个数的和')]
-    public function sum(int $a, int $b = 0): int
+    #[Tool(name: 'sum', description: '计算两个数的和', serverName: 'stdio')]
+    public function sum(#[Description('这是A参数')] int $a, #[Description('这是B参数')] int $b = 0): int
+    {
+        return $a + $b;
+    }
+}
+```
+
+### SSE
+
+```php
+<?php
+
+use Hyperf\Mcp\Server\Annotation\Server;
+
+#[Server(name: 'sse', path: '/sse', description: '这是一个测试命令')]
+class Foo
+{
+    #[Tool(name: 'sum', description: '计算两个数的和', serverName: 'sse')]
+    public function sum(#[Description('这是A参数')] int $a, #[Description('这是B参数')] int $b = 0): int
     {
         return $a + $b;
     }

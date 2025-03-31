@@ -15,7 +15,7 @@ namespace Hyperf\Mcp\Server;
 use Hyperf\Contract\OnCloseInterface;
 use Hyperf\Coordinator\CoordinatorManager;
 use Hyperf\HttpServer\Server;
-use Hyperf\Mcp\Exception\Handler\McpSseExceptionHandler;
+use Hyperf\Mcp\Server\Exception\Handler\McpSseExceptionHandler;
 
 class McpServer extends Server implements OnCloseInterface
 {

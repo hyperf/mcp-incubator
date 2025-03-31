@@ -12,21 +12,23 @@ declare(strict_types=1);
 
 namespace Hyperf\Mcp\Server\Listener;
 
+use Hyperf\Context\ApplicationContext;
 use Hyperf\Context\RequestContext;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BootApplication;
 use Hyperf\HttpServer\Router\DispatcherFactory;
 use Hyperf\HttpServer\Router\Router;
-use Hyperf\Mcp\McpHandler;
+use Hyperf\Mcp\Server\McpHandler;
 use Hyperf\Mcp\Server\McpServer;
+use Hyperf\Mcp\Server\Transport\SseTransport;
 
 class RegisterSseRouterListener implements ListenerInterface
 {
     public function __construct(
         protected DispatcherFactory $dispatcherFactory, // Don't remove this line
         protected ConfigInterface $config,
-        protected McpHandler $mcpHandler
+        protected SseTransport $transport,
     ) {
     }
 
@@ -55,11 +57,12 @@ class RegisterSseRouterListener implements ListenerInterface
 
     protected function registerRouter(string $serverName, string $path): void
     {
-        Router::addServer($serverName, function () use ($path) {
-            Router::addRoute(['GET', 'POST'], $path, function () use ($path) {
+        $handler = new McpHandler($serverName, ApplicationContext::getContainer());
+        Router::addServer($serverName, function () use ($path, $handler) {
+            Router::addRoute(['GET', 'POST'], $path, function () use ($path, $handler) {
                 match (RequestContext::get()->getMethod()) {
-                    'GET' => $this->mcpHandler->handle($path),
-                    'POST' => $this->mcpHandler->process(),
+                    'GET' => $this->transport->register($path),
+                    'POST' => $this->transport->sendMessage($handler->handle($this->transport->readMessage())),
                     default => null,
                 };
             });

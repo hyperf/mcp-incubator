@@ -12,9 +12,11 @@ declare(strict_types=1);
 
 namespace Hyperf\Mcp\Types\Message;
 
-class Response implements MessageInterface
+use Throwable;
+
+class ErrorResponse implements MessageInterface
 {
-    public function __construct(public int $id, public string $jsonrpc, public array $result)
+    public function __construct(public int $id, public string $jsonrpc, public Throwable $throwable)
     {
     }
 }

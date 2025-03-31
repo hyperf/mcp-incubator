@@ -15,7 +15,8 @@
         "hyperf/http-server": "^3.1",
         "hyperf/json-rpc": "^3.1",
         "hyperf/rpc": "^3.1",
-        "hyperf/framework": "^3.1"
+        "hyperf/framework": "^3.1",
+        "hyperf/command": "^3.1"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.73",
