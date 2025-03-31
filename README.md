@@ -46,7 +46,7 @@ use Hyperf\Server\Event;
 use Hyperf\Mcp\Server\McpServer;
 
 return [
-    'type' => Hyperf\Server\CoroutineServer::class,
+    'type' => Hyperf\Server\CoroutineServer::class, # 建议协程风格
     'servers' => [
         'mcp-sse' => [
             'type' => Server::SERVER_HTTP,
