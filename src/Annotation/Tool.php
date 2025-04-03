@@ -37,6 +37,10 @@ class Tool extends McpAnnotation
 
     public function toSchema(): array
     {
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
+            throw new \InvalidArgumentException('Tool name must be alphanumeric and underscores.');
+        }
+
         return [
             'name' => $this->name,
             'description' => $this->description,

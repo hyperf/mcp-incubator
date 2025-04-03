@@ -12,9 +12,23 @@ declare(strict_types=1);
 
 namespace Hyperf\Mcp\Types\Message;
 
-class Response implements MessageInterface
+use JsonSerializable;
+
+class Response implements MessageInterface, JsonSerializable
 {
     public function __construct(public int $id, public string $jsonrpc, public array $result)
     {
+    }
+
+    public function jsonSerialize(): mixed {
+        if (isset($this->result['text'])) {
+            $this->result['text'] = json_encode($this->result['text'], JSON_UNESCAPED_UNICODE);
+        }
+
+        return [
+            'id' => $this->id,
+            'jsonrpc' => $this->jsonrpc,
+            'result' => $this->result,
+        ];
     }
 }

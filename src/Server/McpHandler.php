@@ -50,7 +50,7 @@ class McpHandler
                 $class = $this->container->get($class);
                 $result = $class->{$method}(...$request->params['arguments']);
 
-                $result = ['content' => [['type' => 'text', 'text' => (string) $result]]];
+                $result = ['content' => [['type' => 'text', 'text' => $result]]];
                 break;
             case 'tools/list':
                 $result = ['tools' => TypeCollection::getTools($serverName)];
@@ -64,7 +64,7 @@ class McpHandler
                 $class = $this->container->get($class);
                 $result = $class->{$method}();
 
-                $result = ['content' => [['uri' => $annotation->uri, 'mimeType' => $annotation->mimeType, 'text' => (string) $result]]];
+                $result = ['content' => [['uri' => $annotation->uri, 'mimeType' => $annotation->mimeType, 'text' => $result]]];
                 break;
             case 'prompts/list':
                 $result = ['prompts' => TypeCollection::getPrompts($serverName)];
@@ -75,7 +75,7 @@ class McpHandler
                 $class = $this->container->get($class);
                 $result = $class->{$method}(...$request->params['arguments']);
 
-                $result = ['messages' => [['role' => $annotation->role, 'content' => ['type' => 'text', 'text' => (string) $result]]]];
+                $result = ['messages' => [['role' => $annotation->role, 'content' => ['type' => 'text', 'text' => $result]]]];
                 break;
             case 'notifications/initialized':
             default:
