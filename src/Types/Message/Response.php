@@ -20,7 +20,8 @@ class Response implements MessageInterface, JsonSerializable
     {
     }
 
-    public function jsonSerialize(): mixed {
+    public function jsonSerialize(): mixed
+    {
         if (isset($this->result['text'])) {
             $this->result['text'] = json_encode($this->result['text'], JSON_UNESCAPED_UNICODE);
         }

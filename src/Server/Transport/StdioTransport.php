@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace Hyperf\Mcp\Server\Transport;
 
+use Hyperf\Mcp\Contract\TransportInterface;
 use Hyperf\Mcp\Server\Protocol\Packer;
-use Hyperf\Mcp\Transport\TransportInterface;
 use Hyperf\Mcp\Types\Message\MessageInterface;
 use Hyperf\Mcp\Types\Message\Notification;
 use Hyperf\Mcp\Types\Message\Request;

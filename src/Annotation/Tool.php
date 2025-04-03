@@ -16,6 +16,7 @@ use Attribute;
 use Hyperf\Di\ReflectionManager;
 use Hyperf\Mcp\Constants;
 use Hyperf\Mcp\McpCollector;
+use InvalidArgumentException;
 use ReflectionParameter;
 
 #[Attribute(Attribute::TARGET_METHOD)]
@@ -37,8 +38,8 @@ class Tool extends McpAnnotation
 
     public function toSchema(): array
     {
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
-            throw new \InvalidArgumentException('Tool name must be alphanumeric and underscores.');
+        if (! preg_match('/^[a-zA-Z0-9_]+$/', $this->name)) {
+            throw new InvalidArgumentException('Tool name must be alphanumeric and underscores.');
         }
 
         return [

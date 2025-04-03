@@ -59,11 +59,11 @@ class RegisterCommandListener implements ListenerInterface
                     parent::__construct();
                 }
 
-                public function handle()
+                public function handle(): void
                 {
                     $handler = new McpHandler($this->serverName, $container = ApplicationContext::getContainer());
                     $transport = new StdioTransport($this->input, $this->output, $container->get(Packer::class));
-                    while (true) {
+                    while (true) { // @phpstan-ignore while.alwaysTrue
                         $request = $transport->readMessage();
                         if ($response = $handler->handle($request)) {
                             $transport->sendMessage($response);
@@ -73,12 +73,12 @@ class RegisterCommandListener implements ListenerInterface
             };
 
             $hash = spl_object_hash($asCommand);
-            $this->container->set($hash, $asCommand);
+            $this->container->set($hash, $asCommand); // @phpstan-ignore method.notFound
             $this->appendConfig('commands', $hash);
         }
     }
 
-    private function appendConfig(string $key, $configValues): void
+    private function appendConfig(string $key, mixed $configValues): void
     {
         $configs = $this->config->get($key, []);
         $configs[] = $configValues;

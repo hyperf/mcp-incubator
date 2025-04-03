@@ -81,6 +81,7 @@ class McpHandler
             default:
                 return null;
         }
+
         return new Response($request->id, $request->jsonrpc, $result);
     }
 }

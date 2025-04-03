@@ -14,7 +14,10 @@ namespace Hyperf\Mcp\Types\Message;
 
 class Notification implements MessageInterface
 {
-    public function __construct(public $jsonrpc, public string $method, public ?array $params = null)
-    {
+    public function __construct(
+        public string $jsonrpc,
+        public string $method,
+        public ?array $params = null
+    ) {
     }
 }
