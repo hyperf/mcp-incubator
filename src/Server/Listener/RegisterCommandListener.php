@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Hyperf\Mcp\Server\Listener;
 
 use Hyperf\Command\Command;
-use Hyperf\Context\ApplicationContext;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\Event\Contract\ListenerInterface;
@@ -26,8 +25,10 @@ use Psr\Container\ContainerInterface;
 
 class RegisterCommandListener implements ListenerInterface
 {
-    public function __construct(protected ConfigInterface $config, protected ContainerInterface $container)
-    {
+    public function __construct(
+        protected ContainerInterface $container,
+        protected ConfigInterface $config,
+    ) {
     }
 
     public function listen(): array
@@ -39,6 +40,7 @@ class RegisterCommandListener implements ListenerInterface
 
     public function process(object $event): void
     {
+        /** @var array<array-key, Server> $classes */
         $classes = AnnotationCollector::getClassesByAnnotation(Server::class);
 
         foreach ($classes as $annotation) {
@@ -46,12 +48,12 @@ class RegisterCommandListener implements ListenerInterface
                 continue;
             }
 
-            $asCommand = new class($annotation) extends Command {
+            $asCommand = new class($this->container, $annotation) extends Command {
                 protected bool $coroutine = false;
 
                 protected string $serverName;
 
-                public function __construct(Server $annotation)
+                public function __construct(protected ContainerInterface $container, Server $annotation)
                 {
                     $this->signature = $annotation->signature;
                     $this->description = $annotation->description;
@@ -61,8 +63,13 @@ class RegisterCommandListener implements ListenerInterface
 
                 public function handle(): void
                 {
-                    $handler = new McpHandler($this->serverName, $container = ApplicationContext::getContainer());
-                    $transport = new StdioTransport($this->input, $this->output, $container->get(Packer::class));
+                    $transport = new StdioTransport(
+                        $this->input,
+                        $this->output,
+                        $this->container->get(Packer::class)
+                    );
+                    $handler = new McpHandler($this->serverName, $this->container);
+
                     while (true) { // @phpstan-ignore while.alwaysTrue
                         $request = $transport->readMessage();
                         if ($response = $handler->handle($request)) {
