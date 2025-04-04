@@ -58,7 +58,9 @@ return [
                 Event::ON_CLOSE => [McpServer::class, 'onClose'],
             ],
             'options' => [
-                'mcp_path' => '/sse',
+                'route' => '/sse',
+                'signature' => 'mcp:foo',
+                'description' => '这是一个测试命令',
             ],
         ],
     ],

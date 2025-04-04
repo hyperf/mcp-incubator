@@ -14,10 +14,8 @@ namespace Hyperf\Mcp\Server\Listener;
 
 use Hyperf\Command\Command;
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\BootApplication;
-use Hyperf\Mcp\Server\Annotation\Server;
 use Hyperf\Mcp\Server\McpHandler;
 use Hyperf\Mcp\Server\Protocol\Packer;
 use Hyperf\Mcp\Server\Transport\StdioTransport;
@@ -40,24 +38,25 @@ class RegisterCommandListener implements ListenerInterface
 
     public function process(object $event): void
     {
-        /** @var array<array-key, Server> $classes */
-        $classes = AnnotationCollector::getClassesByAnnotation(Server::class);
-
-        foreach ($classes as $annotation) {
-            if (! $annotation->signature) {
+        foreach ($this->config->get('server.servers', []) as $name => $server) {
+            if (! isset($server['options']['signature'])) {
                 continue;
             }
 
-            $asCommand = new class($this->container, $annotation) extends Command {
+            $serverName = $server['name'] ?? $name;
+            $signature = $server['options']['signature'];
+            $description = $server['options']['description'] ?? null;
+            $asCommand = new class($this->container, $serverName, $signature, $description) extends Command {
                 protected bool $coroutine = false;
 
-                protected string $serverName;
-
-                public function __construct(protected ContainerInterface $container, Server $annotation)
-                {
-                    $this->signature = $annotation->signature;
-                    $this->description = $annotation->description;
-                    $this->serverName = $annotation->name;
+                public function __construct(
+                    protected ContainerInterface $container,
+                    protected string $serverName,
+                    string $signature,
+                    ?string $description = null
+                ) {
+                    $this->signature = $signature;
+                    $this->description = $description;
                     parent::__construct();
                 }
 
