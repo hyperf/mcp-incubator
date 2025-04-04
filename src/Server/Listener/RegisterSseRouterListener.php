@@ -43,12 +43,12 @@ class RegisterSseRouterListener implements ListenerInterface
     {
         foreach ($this->config->get('server.servers', []) as $name => $server) {
             $serverName = $server['name'] ?? $name;
-            $path = $server['options']['mcp_path'] ?? '/';
+            $route = $server['options']['route'] ?? '/';
 
             foreach ($server['callbacks'] ?? [] as $event => $callback) {
                 [$class] = $callback;
                 if (is_a($class, McpServer::class, true)) {
-                    $this->registerRouter($serverName, $path);
+                    $this->registerRouter($serverName, $route);
                     break;
                 }
             }
