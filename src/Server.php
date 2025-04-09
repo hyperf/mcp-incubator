@@ -12,10 +12,12 @@ declare(strict_types=1);
 
 namespace Hyperf\Mcp;
 
+use Hyperf\Mcp\Contract\TransportInterface;
 use Hyperf\Mcp\Types\Message\Notification;
 use Hyperf\Mcp\Types\Message\Request;
 use Hyperf\Mcp\Types\Message\Response;
 use RuntimeException;
+use Throwable;
 
 class Server
 {
@@ -31,9 +33,44 @@ class Server
 
     protected array $promptDefinitions = [];
 
+    protected TransportInterface $transport;
+
     public function __construct(
         public readonly array $serverInfo = [],
     ) {
+    }
+
+    public function connect(TransportInterface $transport): void
+    {
+        $this->transport = $transport;
+        $this->transport->setOnMessage([$this, 'handleMessage']);
+        $this->transport->setOnClose([$this, 'handleClose']);
+        $this->transport->setOnError([$this, 'handleError']);
+    }
+
+    public function handleMessage(string $message): void
+    {
+        $data = json_decode($message, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Invalid JSON: ' . json_last_error_msg());
+        }
+
+        if (! isset($data['method'])) {
+            throw new RuntimeException('Missing method in request');
+        }
+
+        $response = $this->handleRequest(new Request($data['id'], $data['jsonrpc'], $data['method'], $data['params']));
+        $this->transport->sendMessage($response);
+    }
+
+    public function handleClose(): void
+    {
+        // Handle connection close
+    }
+
+    public function handleError(Throwable $throwable): void
+    {
+        // Handle error
     }
 
     public function handleRequest(Notification|Request $request): Response

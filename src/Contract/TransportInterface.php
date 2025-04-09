@@ -19,4 +19,10 @@ interface TransportInterface
     public function sendMessage(MessageInterface $message): void;
 
     public function readMessage(): MessageInterface;
+
+    public function setOnMessage(callable $callback): void;
+
+    public function setOnClose(callable $callback): void;
+
+    public function setOnError(callable $callback): void;
 }
