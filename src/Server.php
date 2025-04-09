@@ -59,6 +59,9 @@ class Server
                 break;
             case 'prompts/get':
                 $result = $this->handleGetPrompt($request->method, $request->params);
+                if (is_string($result)) {
+                    $result = ['messages' => [['role' => 'system', 'content' => ['type' => 'text', 'text' => $result]]]];
+                }
                 break;
             case 'prompts/list':
                 $result = $this->handleListPrompts();
