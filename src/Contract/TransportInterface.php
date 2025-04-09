@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Hyperf\Mcp\Contract;
 
 use Hyperf\Mcp\Types\Message\MessageInterface;
+use Throwable;
 
 interface TransportInterface
 {
@@ -25,4 +26,12 @@ interface TransportInterface
     public function setOnClose(callable $callback): void;
 
     public function setOnError(callable $callback): void;
+
+    public function handleMessage(string $message): void;
+
+    public function handleClose(): void;
+
+    public function handleError(Throwable $throwable): void;
+
+    public function send(string $message): void;
 }

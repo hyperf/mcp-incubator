@@ -25,6 +25,7 @@ use Hyperf\Mcp\Server\Protocol\Packer;
 use Hyperf\Mcp\Types\Message\MessageInterface;
 use Hyperf\Mcp\Types\Message\Notification;
 use Hyperf\Mcp\Types\Message\Request;
+use Throwable;
 
 class SseTransport implements TransportInterface
 {
@@ -38,6 +39,12 @@ class SseTransport implements TransportInterface
      */
     public array $fdMaps = [];
 
+    protected $onMessage;
+
+    protected $onClose;
+
+    protected $onError;
+
     public function __construct(
         protected RequestInterface $request,
         protected ResponseInterface $response,
@@ -47,14 +54,55 @@ class SseTransport implements TransportInterface
     ) {
     }
 
+    public function setOnMessage(callable $callback): void
+    {
+        $this->onMessage = $callback;
+    }
+
+    public function setOnClose(callable $callback): void
+    {
+        $this->onClose = $callback;
+    }
+
+    public function setOnError(callable $callback): void
+    {
+        $this->onError = $callback;
+    }
+
+    public function handleMessage(string $message): void
+    {
+        if ($this->onMessage) {
+            call_user_func($this->onMessage, $message);
+        }
+    }
+
+    public function handleClose(): void
+    {
+        if ($this->onClose) {
+            call_user_func($this->onClose);
+        }
+    }
+
+    public function handleError(Throwable $throwable): void
+    {
+        if ($this->onError) {
+            call_user_func($this->onError, $throwable);
+        }
+    }
+
     public function sendMessage(?MessageInterface $message): void
     {
         if (! $message) {
             return;
         }
         $result = $this->packer->pack($message);
+        $this->send($result);
+    }
+
+    public function send(string $message): void
+    {
         $fd = $this->fdMaps[$this->getServerName()][$this->request->input('sessionId')];
-        $this->connections[$this->getServerName()][$fd]->write("event: message\ndata: {$result}\n\n");
+        $this->connections[$this->getServerName()][$fd]->write("event: message\ndata: {$message}\n\n");
     }
 
     public function readMessage(): Notification|Request
