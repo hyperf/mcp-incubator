@@ -14,8 +14,9 @@ namespace Hyperf\Mcp\Annotation;
 
 use Attribute;
 use Hyperf\Di\ReflectionManager;
+use Hyperf\Mcp\Collector\McpCollector;
+use Hyperf\Mcp\Collector\PromptCollector;
 use Hyperf\Mcp\Constants;
-use Hyperf\Mcp\McpCollector;
 
 #[Attribute(Attribute::TARGET_METHOD)]
 class Prompt extends McpAnnotation
@@ -24,6 +25,7 @@ class Prompt extends McpAnnotation
         public string $name,
         public string $description = '',
         public string $role = 'user',
+        public string $server = '',
         public string $serverName = Constants::DEFAULT_SERVER_NAME
     ) {
     }
@@ -33,6 +35,8 @@ class Prompt extends McpAnnotation
         $this->className = $className;
         $this->target = $target;
         McpCollector::collectMethod($className, $target, $this->name, $this);
+
+        PromptCollector::set($this->server . '.' . $this->name, $this);
     }
 
     public function toSchema(): array

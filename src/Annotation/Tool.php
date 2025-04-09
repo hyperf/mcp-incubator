@@ -14,8 +14,9 @@ namespace Hyperf\Mcp\Annotation;
 
 use Attribute;
 use Hyperf\Di\ReflectionManager;
+use Hyperf\Mcp\Collector\McpCollector;
+use Hyperf\Mcp\Collector\ToolCollector;
 use Hyperf\Mcp\Constants;
-use Hyperf\Mcp\McpCollector;
 use InvalidArgumentException;
 use ReflectionParameter;
 
@@ -25,6 +26,7 @@ class Tool extends McpAnnotation
     public function __construct(
         public string $name,
         public string $description = '',
+        public string $server = '',
         public string $serverName = Constants::DEFAULT_SERVER_NAME
     ) {
     }
@@ -34,6 +36,8 @@ class Tool extends McpAnnotation
         $this->className = $className;
         $this->target = $target;
         McpCollector::collectMethod($className, $target, $this->name, $this);
+
+        ToolCollector::set($this->server . '.' . $this->name, $this);
     }
 
     public function toSchema(): array

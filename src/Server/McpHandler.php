@@ -14,7 +14,7 @@ namespace Hyperf\Mcp\Server;
 
 use Hyperf\Mcp\Annotation;
 use Hyperf\Mcp\Capabilities;
-use Hyperf\Mcp\McpCollector;
+use Hyperf\Mcp\Collector\McpCollector;
 use Hyperf\Mcp\TypeCollection;
 use Hyperf\Mcp\Types\Message\Notification;
 use Hyperf\Mcp\Types\Message\Request;

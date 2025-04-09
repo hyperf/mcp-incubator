@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace Hyperf\Mcp;
+namespace Hyperf\Mcp\Collector;
 
 use Hyperf\Di\MetadataCollector;
 use Hyperf\Mcp\Annotation\McpAnnotation;
