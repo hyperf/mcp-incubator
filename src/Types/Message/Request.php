@@ -14,7 +14,7 @@ namespace Hyperf\Mcp\Types\Message;
 
 class Request implements MessageInterface
 {
-    public function __construct(public int $id, public string $jsonrpc, public string $method, public ?array $params = null)
+    public function __construct(public mixed $id, public string $jsonrpc, public string $method, public ?array $params = null)
     {
     }
 }
