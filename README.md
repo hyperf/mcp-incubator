@@ -5,7 +5,7 @@
 ## 安装
 
 ```bash
-composer require hyperf/mcp-incubator
+composer require webguosai/mcp-incubator
 ```
 
 ## 使用

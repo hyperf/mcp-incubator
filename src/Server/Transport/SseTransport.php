@@ -60,6 +60,7 @@ class SseTransport implements TransportInterface
     protected function getBodyContent(): string
     {
         // swoole header头中包含 Upgrade: h2c，会导致swoole解析body为空
+        // issue：https://github.com/swoole/swoole-src/issues/5766
         $rawBody = RequestContext::get()->getSwooleRequest()->getData();
         [$_, $body] = explode("\r\n\r\n", $rawBody, 2);
 
