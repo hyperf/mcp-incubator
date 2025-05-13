@@ -57,10 +57,21 @@ class SseTransport implements TransportInterface
         $this->connections[$this->getServerName()][$fd]->write("event: message\ndata: {$result}\n\n");
     }
 
+    protected function getBodyContent(): string
+    {
+        // swoole header头中包含 Upgrade: h2c，会导致swoole解析body为空
+        $rawBody = RequestContext::get()->getSwooleRequest()->getData();
+        [$_, $body] = explode("\r\n\r\n", $rawBody, 2);
+
+        return $body;
+        // return $this->request->getBody()->getContents();
+    }
+
     public function readMessage(): Notification|Request
     {
-        $message = $this->packer->unpack($this->request->getBody()->getContents());
-        if (! isset($message['id'])) {
+        $message = $this->packer->unpack($this->getBodyContent());
+
+        if (!isset($message['id'])) {
             return new Notification(...$message);
         }
         return new Request(...$message);
@@ -86,9 +97,9 @@ class SseTransport implements TransportInterface
         unset($this->connections[$serverName][$fd], $this->fdMaps[$serverName][$sessionId]);
     }
 
-    public function getRequestId(): int
+    public function getRequestId(): mixed
     {
-        $data = $this->packer->unpack($this->request->getBody()->getContents());
+        $data = $this->packer->unpack($this->getBodyContent());
         return $data['id'];
     }
 

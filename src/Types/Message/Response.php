@@ -16,7 +16,7 @@ use JsonSerializable;
 
 class Response implements MessageInterface, JsonSerializable
 {
-    public function __construct(public int $id, public string $jsonrpc, public array $result)
+    public function __construct(public mixed $id, public string $jsonrpc, public array $result)
     {
     }
 

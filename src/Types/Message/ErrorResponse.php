@@ -16,7 +16,7 @@ use Throwable;
 
 class ErrorResponse implements MessageInterface
 {
-    public function __construct(public int $id, public string $jsonrpc, public Throwable $throwable)
+    public function __construct(public mixed $id, public string $jsonrpc, public Throwable $throwable)
     {
     }
 }
