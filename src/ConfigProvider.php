@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace Hyperf\Mcp;
 
 use Hyperf\Mcp\Contract\IdGeneratorInterface;
-use Hyperf\Mcp\IdGenerator\UniqidIdGenerator;
+use Hyperf\Mcp\IdGenerator\SessionIdGenerator;
 use Hyperf\Mcp\Server\Listener\RegisterCommandListener;
 use Hyperf\Mcp\Server\Listener\RegisterSseRouterListener;
 
@@ -23,13 +23,13 @@ class ConfigProvider
     {
         return [
             'dependencies' => [
-                IdGeneratorInterface::class => UniqidIdGenerator::class,
+                IdGeneratorInterface::class => SessionIdGenerator::class,
             ],
-            'listeners' => [
+            'listeners'    => [
                 RegisterCommandListener::class,
                 RegisterSseRouterListener::class,
             ],
-            'annotations' => [
+            'annotations'  => [
                 'scan' => [
                     'collectors' => [
                         McpCollector::class,
