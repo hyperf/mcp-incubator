@@ -84,7 +84,7 @@ class SseTransport implements TransportInterface
         $sessionId = $this->idGenerator->generate();
         $fd = $this->getFd();
 
-        $this->logger->debug("McpSSE Request {$serverName} {$fd} {$sessionId}");
+        $this->logger->info("McpSSE Request {$serverName} {$fd} {$sessionId}");
 
         $eventStream = (new EventStream($this->response->getConnection())) // @phpstan-ignore method.notFound
             ->write('event: endpoint' . PHP_EOL)
